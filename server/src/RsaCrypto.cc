@@ -17,10 +17,12 @@ RsaCrypto::RsaCrypto(string fileName, bool isPrivate)
 	m_privateKey = RSA_new();
 	if (isPrivate)
 	{
+		std::cout << "初始化私钥..." << fileName << std::endl;
 		initPrivateKey(fileName);
 	}
 	else
 	{
+		std::cout << "初始化公钥..." << fileName << std::endl;
 		initPublicKey(fileName);
 	}
 }
@@ -208,9 +210,11 @@ bool RsaCrypto::rsaVerify(string data, string signData, SignLevel level)
 	// 验证签名
 	int keyLen = RSA_size(m_publicKey);
 	char* sign = fromBase64(signData);
-	int ret = RSA_verify(level, (const unsigned char*)data.data(), data.size(),
+	std::cout << "签名数据长度: " << strlen(sign) << std::endl;
+	int ret = RSA_verify(level, (const unsigned char*)data.c_str(), data.length(),
 		(const unsigned char*)sign, keyLen, m_publicKey);
 	delete[]sign;
+	std::cout << "验证签名结果: " << m_publicKey << std::endl;
 	if (ret == -1)
 	{
 		ERR_print_errors_fp(stdout);
@@ -238,7 +242,7 @@ string RsaCrypto::toBase64(const char* str, int len)
 	return retStr;
 }
 
-char* RsaCrypto::fromBase64(string str)
+char* RsaCrypto::fromBase64(const std::string& str)
 {
 	int length = str.size();
 	BIO* bs64 = BIO_new(BIO_f_base64());

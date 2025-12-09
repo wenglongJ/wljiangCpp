@@ -3,6 +3,7 @@
 #include <sys/shm.h>
 #include <string.h>
 #include <iostream>
+#include <string>
 
 const char RandX = 'x';
 BaseShm::BaseShm(int key)
@@ -15,13 +16,13 @@ BaseShm::BaseShm(int key, int size)
 	getShmID(key, size, IPC_CREAT | 0664);
 }
 
-BaseShm::BaseShm(string name)
+BaseShm::BaseShm(const std::string& name)
 {
 	key_t key = ftok(name.data(), RandX);
 	getShmID(key, 0, 0);
 }
 
-BaseShm::BaseShm(string name, int size)
+BaseShm::BaseShm(const std::string& name, int size)
 {
 	key_t key = ftok(name.data(), RandX);
 	// 创建共享内存

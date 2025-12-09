@@ -27,7 +27,7 @@ TcpSocket::~TcpSocket()
 	disConnect();
 }
 
-int TcpSocket::connectToHost(string ip, unsigned short port, int timeout)
+int TcpSocket::connectToHost(std::string ip, unsigned short port, int timeout)
 {
 	int ret = 0;
 	if (port <= 0 || port > 65535 || timeout < 0)
@@ -69,7 +69,7 @@ int TcpSocket::connectToHost(string ip, unsigned short port, int timeout)
 	return ret;
 }
 
-int TcpSocket::sendMsg(string sendData, int timeout)
+int TcpSocket::sendMsg(std::string sendData, int timeout)
 {
 	// 返回0->没超时, 返回-1->超时
 	int ret = writeTimeout(timeout);
@@ -122,7 +122,7 @@ int TcpSocket::sendMsg(string sendData, int timeout)
 	return ret;
 }
 
-string TcpSocket::recvMsg(int timeout)
+std::string TcpSocket::recvMsg(int timeout)
 {
 	// 返回0 -> 没超时就接收到了数据, -1, 超时或有异常
 	int ret = readTimeout(timeout); 
@@ -131,12 +131,12 @@ string TcpSocket::recvMsg(int timeout)
 		if (ret == -1 || errno == ETIMEDOUT)
 		{
 			printf("readTimeout(timeout) err: TimeoutError \n");
-			return string();
+			return std::string();
 		}
 		else
 		{
 			printf("readTimeout(timeout) err: %d \n", ret);
-			return string();
+			return std::string();
 		}
 	}
 
@@ -145,12 +145,12 @@ string TcpSocket::recvMsg(int timeout)
 	if (ret == -1)
 	{
 		printf("func readn() err:%d \n", ret);
-		return string();
+		return std::string();
 	}
 	else if (ret < 4)
 	{
 		printf("func readn() err peer closed:%d \n", ret);
-		return string();
+		return std::string();
 	}
 
 	int n = ntohl(netdatalen);
@@ -160,24 +160,24 @@ string TcpSocket::recvMsg(int timeout)
 	{
 		ret = MallocError;
 		printf("malloc() err \n");
-		// 返回空字符串以匹配函数返回类型，避免返回 NULL 指针给 std::string
-		return string();
+		// 返回空字符串以匹配函数返回类型，避免返回 NULL 指针给 std::std::string
+		return std::string();
 	}
 
 	ret = readn(tmpBuf, n); //根据长度读数据
 	if (ret == -1)
 	{
 		printf("func readn() err:%d \n", ret);
-		return string();
+		return std::string();
 	}
 	else if (ret < n)
 	{
 		printf("func readn() err peer closed:%d \n", ret);
-		return string();
+		return std::string();
 	}
 
 	tmpBuf[n] = '\0'; //多分配一个字节内容，兼容可见字符串 字符串的真实长度仍然为n
-	string data = string(tmpBuf);
+	std::string data = std::string(tmpBuf);
 	// 释放内存
 	free(tmpBuf);
 

@@ -99,7 +99,8 @@ string ServerOP::seckeyAgree(RequestMsg* reqMsg)
 	Hash sha(T_SHA1);
 	sha.addData(reqMsg->data());
 	cout << "1111111111111111" << endl;
-	bool bl = rsa.rsaVerify(sha.result(), reqMsg->sign());
+	// 使用二进制摘要进行验证（RSA_verify 期望传入二进制摘要）
+	bool bl = rsa.rsaVerify(sha.resultRaw(), reqMsg->sign());
 	cout << "00000000000000000000" << endl;
 	if (bl == false)
 	{

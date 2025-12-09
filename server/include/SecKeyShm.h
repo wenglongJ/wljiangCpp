@@ -12,12 +12,12 @@ class SecKeyShm : public BaseShm
 {
 public:
 	SecKeyShm(int key, int maxNode);
-	SecKeyShm(string pathName, int maxNode);
+	SecKeyShm(std::string pathName, int maxNode);
 	~SecKeyShm();
 
 	void shmInit();
 	int shmWrite(NodeSecKeyInfo* pNodeInfo);
-	NodeSecKeyInfo shmRead(string clientID, string serverID);
+	NodeSecKeyInfo shmRead(std::string clientID, std::string serverID);
 
 private:
 	int m_maxNode;

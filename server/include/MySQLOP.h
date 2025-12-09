@@ -18,8 +18,8 @@ public:
     ~MySQLOP();
 
     // 初始化环境连接数据库
-    bool connectDB(const string& user, const string& passwd, const string& host, 
-                   unsigned int port, const string& database);
+    bool connectDB(const std::string& user, const std::string& passwd, const std::string& host, 
+                   unsigned int port, const std::string& database);
     
     // 得到keyID -> 根据实际业务需求封装的小函数
     int getKeyID();
@@ -29,7 +29,7 @@ public:
 
 private:
     // 获取当前时间，并格式化为字符串
-    string getCurTime();
+    std::string getCurTime();
 
 private:
     sql::mysql::MySQL_Driver* m_driver;

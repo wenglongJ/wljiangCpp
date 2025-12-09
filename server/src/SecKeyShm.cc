@@ -12,7 +12,7 @@ SecKeyShm::SecKeyShm(int key, int maxNode)
 {
 }
 
-SecKeyShm::SecKeyShm(string pathName, int maxNode)
+SecKeyShm::SecKeyShm(std::string pathName, int maxNode)
 	: BaseShm(pathName, maxNode * sizeof(NodeSecKeyInfo))
 	, m_maxNode(maxNode)
 {
@@ -87,7 +87,7 @@ int SecKeyShm::shmWrite(NodeSecKeyInfo * pNodeInfo)
 	return ret;
 }
 
-NodeSecKeyInfo SecKeyShm::shmRead(string clientID, string serverID)
+NodeSecKeyInfo SecKeyShm::shmRead(std::string clientID, std::string serverID)
 {
 	int ret = 0;
 	// 关联共享内存

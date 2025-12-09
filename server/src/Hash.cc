@@ -105,6 +105,13 @@ string Hash::md5Result()
 	return string(res, MD5_DIGEST_LENGTH * 2);
 }
 
+string Hash::md5ResultRaw()
+{
+	unsigned char md[MD5_DIGEST_LENGTH];
+	MD5_Final(md, &m_md5);
+	return string(reinterpret_cast<char*>(md), MD5_DIGEST_LENGTH);
+}
+
 string Hash::sha1Result()
 {
 	unsigned char md[SHA_DIGEST_LENGTH];
@@ -116,6 +123,13 @@ string Hash::sha1Result()
 	}
 	res[SHA_DIGEST_LENGTH * 2] = '\0';
 	return string(res, SHA_DIGEST_LENGTH * 2);
+}
+
+string Hash::sha1ResultRaw()
+{
+	unsigned char md[SHA_DIGEST_LENGTH];
+	SHA1_Final(md, &m_sha1);
+	return string(reinterpret_cast<char*>(md), SHA_DIGEST_LENGTH);
 }
 
 string Hash::sha224Result()
@@ -131,6 +145,13 @@ string Hash::sha224Result()
 	return string(res, SHA224_DIGEST_LENGTH * 2);
 }
 
+string Hash::sha224ResultRaw()
+{
+	unsigned char md[SHA224_DIGEST_LENGTH];
+	SHA224_Final(md, &m_sha224);
+	return string(reinterpret_cast<char*>(md), SHA224_DIGEST_LENGTH);
+}
+
 string Hash::sha256Result()
 {
 	unsigned char md[SHA256_DIGEST_LENGTH];
@@ -142,6 +163,13 @@ string Hash::sha256Result()
 	}
 	res[SHA256_DIGEST_LENGTH * 2] = '\0';
 	return string(res, SHA256_DIGEST_LENGTH * 2);
+}
+
+string Hash::sha256ResultRaw()
+{
+	unsigned char md[SHA256_DIGEST_LENGTH];
+	SHA256_Final(md, &m_sha256);
+	return string(reinterpret_cast<char*>(md), SHA256_DIGEST_LENGTH);
 }
 
 string Hash::sha384Result()
@@ -157,6 +185,13 @@ string Hash::sha384Result()
 	return string(res, SHA384_DIGEST_LENGTH * 2);
 }
 
+string Hash::sha384ResultRaw()
+{
+	unsigned char md[SHA384_DIGEST_LENGTH];
+	SHA384_Final(md, &m_sha384);
+	return string(reinterpret_cast<char*>(md), SHA384_DIGEST_LENGTH);
+}
+
 string Hash::sha512Result()
 {
 	unsigned char md[SHA512_DIGEST_LENGTH];
@@ -168,4 +203,33 @@ string Hash::sha512Result()
 	}
 	res[SHA512_DIGEST_LENGTH * 2] = '\0';
 	return string(res, SHA512_DIGEST_LENGTH * 2);
+}
+
+string Hash::sha512ResultRaw()
+{
+	unsigned char md[SHA512_DIGEST_LENGTH];
+	SHA512_Final(md, &m_sha512);
+	return string(reinterpret_cast<char*>(md), SHA512_DIGEST_LENGTH);
+}
+
+// 返回原始二进制摘要
+string Hash::resultRaw()
+{
+	switch (m_type)
+	{
+	case HashType::T_MD5:
+		return md5ResultRaw();
+	case HashType::T_SHA1:
+		return sha1ResultRaw();
+	case HashType::T_SHA224:
+		return sha224ResultRaw();
+	case HashType::T_SHA256:
+		return sha256ResultRaw();
+	case HashType::T_SHA384:
+		return sha384ResultRaw();
+	case HashType::T_SHA512:
+		return sha512ResultRaw();
+	default:
+		return md5ResultRaw();
+	}
 }

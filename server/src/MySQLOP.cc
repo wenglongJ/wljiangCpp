@@ -29,15 +29,15 @@ MySQLOP::~MySQLOP()
     closeDB();
 }
 
-bool MySQLOP::connectDB(const string& user, const string& passwd, const string& host, 
-                        unsigned int port, const string& database)
+bool MySQLOP::connectDB(const std::string& user, const std::string& passwd, const std::string& host, 
+                        unsigned int port, const std::string& database)
 {
     try {
         // 1. 获取 MySQL 驱动实例
         m_driver = sql::mysql::get_mysql_driver_instance();
         
         // 2. 构建连接字符串
-        string connStr = "tcp://" + host + ":" + to_string(port) + "/" + database;
+        std::string connStr = "tcp://" + host + ":" + to_string(port) + "/" + database;
 
         // 3. 建立连接
         m_conn = m_driver->connect(connStr, user, passwd);
@@ -65,7 +65,7 @@ bool MySQLOP::connectDB(const string& user, const string& passwd, const string& 
 int MySQLOP::getKeyID()
 {
     // 查询数据库
-    string sql = "SELECT ikeysn FROM SECMNG.KEYSN LIMIT 1 FOR UPDATE";
+    std::string sql = "SELECT ikeysn FROM SECMNG.KEYSN LIMIT 1 FOR UPDATE";
     
     Statement* stat = nullptr;
     ResultSet* resSet = nullptr;
@@ -121,7 +121,7 @@ int MySQLOP::getKeyID()
 bool MySQLOP::updateKeyID(int keyID)
 {
     // 更新数据库
-    string sql = "UPDATE SECMNG.KEYSN SET ikeysn = ? WHERE 1=1";
+    std::string sql = "UPDATE SECMNG.KEYSN SET ikeysn = ? WHERE 1=1";
     
     PreparedStatement* pstmt = nullptr;
     
@@ -166,7 +166,7 @@ bool MySQLOP::writeSecKey(NodeSecKeyInfo* pNode)
     }
 
     // 使用预处理语句防止 SQL 注入
-    string sql = "INSERT INTO SECMNG.SECKEYINFO(clientid, serverid, keyid, createtime, state, seckey) "
+    std::string sql = "INSERT INTO SECMNG.SECKEYINFO(clientid, serverid, keyid, createtime, state, seckey) "
                  "VALUES (?, ?, ?, STR_TO_DATE(?, '%Y-%m-%d %H:%i:%S'), ?, ?)";
     
     PreparedStatement* pstmt = nullptr;
@@ -225,7 +225,7 @@ void MySQLOP::closeDB()
     }
 }
 
-string MySQLOP::getCurTime()
+std::string MySQLOP::getCurTime()
 {
     time_t timep;
     time(&timep);
