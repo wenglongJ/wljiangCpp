@@ -1,0 +1,9 @@
+{
+    "ServerID":"BJ-QianMen-001",
+    "UserDB":"root",
+    "PwdDB":"jwl123456",
+    "ConnStrDB":"SECMNG",
+    "Port":8806,
+    "ShmMaxNode":20,
+    "ShmKey":"/home/wljiang/workspace/wljiangCpp"
+}

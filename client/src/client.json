@@ -1,0 +1,8 @@
+{
+    "ClientID":"BJ-ChangPing-TBD",
+    "ServerID":"BJ-QianMen-001",
+    "ServerIP":"127.0.0.1",
+    "Port":8806,
+    "ShmMaxNode":1,
+    "ShmKey":"/home/wljiang/workspace/wljiangCpp"
+}
