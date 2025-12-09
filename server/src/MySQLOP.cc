@@ -12,6 +12,14 @@
 using namespace std;
 using namespace sql;
 
+// MySQLOP - MySQL 操作封装
+// 目的：封装基础的 DB 操作（连接、获取 keyID、更新 keyID、写入密钥记录）。
+// 约定与注意事项：
+// - 本文件使用 C++ Connector/C++ 原生 API，返回的 Statement/ResultSet/PreparedStatement
+//   均由本类分配并在使用后通过 delete 释放。调用者无需也不应释放这些内部对象。
+// - 所有对 m_conn 的使用均在连接存在性检查后进行，并在异常路径中释放局部对象。
+// - 时间字符串由 getCurTime() 生成，格式为 "%Y-%m-%d %H:%M:%S"。
+
 MySQLOP::MySQLOP() : m_driver(nullptr), m_conn(nullptr)
 {
 }

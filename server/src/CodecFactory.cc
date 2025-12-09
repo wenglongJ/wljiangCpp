@@ -16,4 +16,4 @@ Codec * CodecFactory::createCodec()
 CodecFactory::~CodecFactory()
 {
 }
-}
+// End of file

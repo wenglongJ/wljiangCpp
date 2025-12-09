@@ -78,6 +78,7 @@ bool ClientOP::seckeyAgree()
 	if (ret != 0)
 	{
 		cout << "连接服务器失败..." << endl;
+		delete tcp;
 		return false;
 	}
 	cout << "连接服务器成功..." << endl;
@@ -95,6 +96,11 @@ bool ClientOP::seckeyAgree()
 	if (!resData->status())
 	{
 		cout << "秘钥协商失败" << endl;
+		// 清理资源后返回
+		delete factory;
+		delete c;
+		tcp->disConnect();
+		delete tcp;
 		return false;
 	}
 	// 将得到的密文解密

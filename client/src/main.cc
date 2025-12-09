@@ -7,6 +7,7 @@ int usage();
 int main()
 {
 	// 创建客户端操作类对象
+	// 注意：此处使用硬编码配置路径。生产或测试时建议通过命令行参数传入或使用相对路径。
 	ClientOP op("/home/wljiang/workspace/wljiangCpp/client/src/client.json");
 	while (1)
 	{

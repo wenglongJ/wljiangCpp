@@ -36,7 +36,11 @@ RsaCrypto::~RsaCrypto()
 void RsaCrypto::parseKeyString(string keystr, bool pubKey)
 {
 	// 字符串数据 -> BIO对象中
-	BIO* bio = BIO_new_mem_buf(keystr.data(), keystr.size());
+	BIO* bio = BIO_new_mem_buf(keystr.data(), (int)keystr.size());
+	if (bio == NULL)
+	{
+		return;
+	}
 	// 公钥字符串
 	if (pubKey)
 	{
@@ -62,18 +66,24 @@ void RsaCrypto::generateRsakey(int bits, string pub, string pri)
 
 	// 创建bio文件对象
 	BIO* pubIO = BIO_new_file(pub.data(), "w");
-	// 公钥以pem格式写入到文件中
-	PEM_write_bio_RSAPublicKey(pubIO, r);
-	// 缓存中的数据刷到文件中
-	BIO_flush(pubIO);
-	BIO_free(pubIO);
+	if (pubIO != NULL)
+	{
+		// 公钥以pem格式写入到文件中
+		PEM_write_bio_RSAPublicKey(pubIO, r);
+		// 缓存中的数据刷到文件中
+		BIO_flush(pubIO);
+		BIO_free(pubIO);
+	}
 
 	// 创建bio对象
 	BIO* priBio = BIO_new_file(pri.data(), "w");
-	// 私钥以pem格式写入文件中
-	PEM_write_bio_RSAPrivateKey(priBio, r, NULL, NULL, 0, NULL, NULL);
-	BIO_flush(priBio);
-	BIO_free(priBio);
+	if (priBio != NULL)
+	{
+		// 私钥以pem格式写入文件中
+		PEM_write_bio_RSAPrivateKey(priBio, r, NULL, NULL, 0, NULL, NULL);
+		BIO_flush(priBio);
+		BIO_free(priBio);
+	}
 
 	// 得到公钥和私钥
 	m_privateKey = RSAPrivateKey_dup(r);
@@ -88,10 +98,16 @@ bool RsaCrypto::initPublicKey(string pubfile)
 {
 	// 通过BIO读文件
 	BIO* pubBio = BIO_new_file(pubfile.data(), "r");
+	if (pubBio == NULL)
+	{
+		ERR_print_errors_fp(stdout);
+		return false;
+	}
 	// 将bio中的pem数据读出
 	if (PEM_read_bio_RSAPublicKey(pubBio, &m_publicKey, NULL, NULL) == NULL)
 	{
 		ERR_print_errors_fp(stdout);
+		BIO_free(pubBio);
 		return false;
 	}
 	BIO_free(pubBio);
@@ -102,10 +118,16 @@ bool RsaCrypto::initPrivateKey(string prifile)
 {
 	// 通过bio读文件
 	BIO* priBio = BIO_new_file(prifile.data(), "r");
+	if (priBio == NULL)
+	{
+		ERR_print_errors_fp(stdout);
+		return false;
+	}
 	// 将bio中的pem数据读出
 	if (PEM_read_bio_RSAPrivateKey(priBio, &m_privateKey, NULL, NULL) == NULL)
 	{
 		ERR_print_errors_fp(stdout);
+		BIO_free(priBio);
 		return false;
 	}
 	BIO_free(priBio);
@@ -115,10 +137,8 @@ bool RsaCrypto::initPrivateKey(string prifile)
 
 string RsaCrypto::rsaPubKeyEncrypt(string data)
 {
-	cout << "加密数据长度: " << data.size() << endl;
 	// 计算公钥长度
 	int keyLen = RSA_size(m_publicKey);
-	cout << "pubKey len: " << keyLen << endl;
 	// 申请内存空间
 	char* encode = new char[keyLen + 1];
 	// 使用公钥加密
@@ -128,7 +148,6 @@ string RsaCrypto::rsaPubKeyEncrypt(string data)
 	if (ret >= 0)
 	{
 		// 加密成功
-		cout << "ret: " << ret << ", keyLen: " << keyLen << endl;
 		retStr = toBase64(encode, ret);
 	}
 	else
@@ -159,7 +178,7 @@ string RsaCrypto::rsaPriKeyDecrypt(string encData)
 	}
 	else
 	{
-		cout << "私钥解密失败..." << endl;
+		// 私钥解密失败
 		ERR_print_errors_fp(stdout);
 	}
 	delete[]decode;

@@ -14,7 +14,7 @@ RequestFactory::RequestFactory(RequestInfo * info) : CodecFactory()
 
 Codec * RequestFactory::createCodec()
 {
-	Codec* codec = NULL;
+	Codec* codec = nullptr;
 	if (m_flag)
 	{
 		codec = new RequestCodec(m_info);

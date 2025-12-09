@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include "RespondCodec.h"
 
+// RespondCodec - 将 RespondMsg（protobuf）与二进制字符串互转
+// 说明：decodeMsg 返回指向内部成员 `m_msg` 的指针（由本对象管理），调用方不得 delete 返回指针。
 RespondCodec::RespondCodec()
 {
 }
@@ -38,6 +40,7 @@ string RespondCodec::encodeMsg()
 
 void* RespondCodec::decodeMsg()
 {
+	// 解析到内部 m_msg 并返回其地址；返回值为有效指针并由本对象管理
 	m_msg.ParseFromString(m_encstr);
 	return &m_msg;
 }

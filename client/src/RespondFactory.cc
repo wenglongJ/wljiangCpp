@@ -15,7 +15,7 @@ RespondFactory::RespondFactory(RespondInfo * info) : CodecFactory()
 
 Codec * RespondFactory::createCodec()
 {
-	Codec* codec = NULL;
+	Codec* codec = nullptr;
 	if (m_flag)
 	{
 		codec = new RespondCodec(m_info);
