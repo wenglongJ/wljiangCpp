@@ -15,11 +15,11 @@ string Codec::encodeMsg()
 
 void* Codec::decodeMsg()
 {
-	return NULL;
+	return nullptr;
 }
 
 
 Codec::~Codec()
 {
 }
-}
+// End of file

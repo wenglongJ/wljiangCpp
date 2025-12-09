@@ -1,6 +1,9 @@
 ﻿#include "RespondFactory.h"
 using namespace std;
 
+// RespondFactory
+// 说明：createCodec 会返回由工厂分配的裸指针（`new RespondCodec`），
+// 调用方需负责 delete 该指针以释放资源。建议未来统一为智能指针以避免内存泄漏。
 RespondFactory::RespondFactory(std::string enc) : CodecFactory()
 {
 	m_flag = false;
@@ -15,7 +18,7 @@ RespondFactory::RespondFactory(RespondInfo * info) : CodecFactory()
 
 Codec * RespondFactory::createCodec()
 {
-	Codec* codec = NULL;
+	Codec* codec = nullptr;
 	if (m_flag)
 	{
 		codec = new RespondCodec(m_info);
@@ -29,7 +32,6 @@ Codec * RespondFactory::createCodec()
 	return codec;
 	//return m_ptr.get();
 }
-
 
 RespondFactory::~RespondFactory()
 {

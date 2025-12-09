@@ -44,24 +44,21 @@ int SecKeyShm::shmWrite(NodeSecKeyInfo * pNodeInfo)
 	{
 		// pNode依次指向每个节点的首地址
 		pNode = pAddr + i;
-		cout << i << endl;
-		cout << "clientID 比较: " << pNode->clientID << ", " << pNodeInfo->clientID << endl;
-		cout << "serverID 比较: " << pNode->serverID << ", " << pNodeInfo->serverID << endl;
-		cout << endl;
+		// 调试输出已移除；生产环境请使用统一日志并避免打印敏感信息
 		if (strcmp(pNode->clientID, pNodeInfo->clientID) == 0 &&
 			strcmp(pNode->serverID, pNodeInfo->serverID) == 0)
 		{
 			// 如果找到了该网点秘钥已经存在, 使用新秘钥覆盖旧的值
 			memcpy(pNode, pNodeInfo, sizeof(NodeSecKeyInfo));
 			unmapShm();
-			cout << "写数据成功: 原数据被覆盖!" << endl;
 			return 0;
 		}
 	}
 
 	// 若没有找到对应的信息, 找一个空节点将秘钥信息写入
 	int i = 0;
-	NodeSecKeyInfo tmpNodeInfo; //空结点
+	// 必须初始化 tmpNodeInfo 为全 0，否则 memcmp 会读取未初始化内存导致未定义行为
+	NodeSecKeyInfo tmpNodeInfo{}; //空结点（值初始化）
 	for (i = 0; i < m_maxNode; i++)
 	{
 		pNode = pAddr + i;
@@ -90,23 +87,19 @@ NodeSecKeyInfo SecKeyShm::shmRead(string clientID, string serverID)
 	pAddr = static_cast<NodeSecKeyInfo*>(mapShm());
 	if (pAddr == NULL)
 	{
-		cout << "共享内存关联失败..." << endl;
+		// 关联失败
 		return NodeSecKeyInfo();
 	}
-	cout << "共享内存关联成功..." << endl;
 
 	//遍历网点信息
 	int i = 0;
 	NodeSecKeyInfo info;
 	NodeSecKeyInfo	*pNode = NULL;
 	// 通过clientID和serverID查找节点
-	cout << "maxNode: " << m_maxNode << endl;
 	for (i = 0; i < m_maxNode; i++)
 	{
 		pNode = pAddr + i;
-		cout << i << endl;
-		cout << "clientID 比较: " << pNode->clientID << ", " << clientID.data() << endl;
-		cout << "serverID 比较: " << pNode->serverID << ", " << serverID.data() << endl;
+		// 调试输出已移除
 		if (strcmp(pNode->clientID, clientID.data()) == 0 &&
 			strcmp(pNode->serverID, serverID.data()) == 0)
 		{

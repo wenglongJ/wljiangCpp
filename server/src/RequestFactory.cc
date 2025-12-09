@@ -1,5 +1,8 @@
 ﻿#include "RequestFactory.h"
 
+// RequestFactory
+// 说明：根据构造方式不同，createCodec 会返回新分配的 `RequestCodec*`。
+// 调用方对返回的裸指针负责 delete（见调用站点）。建议未来改为返回 `unique_ptr<Codec>`。
 RequestFactory::RequestFactory(std::string enc) : CodecFactory()
 {
 	m_flag = false;
@@ -14,7 +17,7 @@ RequestFactory::RequestFactory(RequestInfo * info) : CodecFactory()
 
 Codec * RequestFactory::createCodec()
 {
-	Codec* codec = NULL;
+	Codec* codec = nullptr;
 	if (m_flag)
 	{
 		codec = new RequestCodec(m_info);
@@ -25,7 +28,6 @@ Codec * RequestFactory::createCodec()
 	}
 	return codec;
 }
-
 
 RequestFactory::~RequestFactory()
 {
