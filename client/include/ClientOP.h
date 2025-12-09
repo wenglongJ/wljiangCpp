@@ -21,10 +21,10 @@ public:
 	bool seckeyAgree();
 
 	// 秘钥校验
-	void seckeyCheck() {}
+	void seckeyCheck();
 
 	// 秘钥注销
-	void seckeyZhuXiao() {}
+	void seckeyZhuXiao();
 
 private:
 	ClientInfo m_info;

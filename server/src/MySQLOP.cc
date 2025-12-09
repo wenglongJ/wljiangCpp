@@ -233,3 +233,31 @@ std::string MySQLOP::getCurTime()
     strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S", localtime(&timep));
     return tmp;
 }
+
+bool MySQLOP::revokeSecKey(int keyID)
+{
+    // 更新 SECKEYINFO 表，将 state 置为 0
+    std::string sql = "UPDATE SECMNG.SECKEYINFO SET state = 0 WHERE keyid = ?";
+    PreparedStatement* pstmt = nullptr;
+    try {
+        if (m_conn == nullptr) {
+            cerr << "数据库未连接: 无法注销密钥" << endl;
+            return false;
+        }
+        pstmt = m_conn->prepareStatement(sql);
+        pstmt->setInt(1, keyID);
+        int ret = pstmt->executeUpdate();
+        delete pstmt;
+        pstmt = nullptr;
+        if (ret <= 0) {
+            cerr << "注销密钥失败，未影响任何行，keyid: " << keyID << endl;
+            return false;
+        }
+        cout << "✅ 成功将 keyid " << keyID << " 标记为已注销(state=0)" << endl;
+        return true;
+    } catch (sql::SQLException& e) {
+        cerr << "❌ 注销密钥异常: " << e.what() << endl;
+        if (pstmt != nullptr) { delete pstmt; pstmt = nullptr; }
+        return false;
+    }
+}

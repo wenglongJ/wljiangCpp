@@ -39,7 +39,7 @@ public:
 private:
 	string toBase64(const char* str, int len);
 	// base64解码，返回原始二进制数据（作为 std::string，可能包含二进制零字节）
-	char* fromBase64(const std::string& str);
+	std::string fromBase64(const std::string& str);
 	// 得到公钥
 	bool initPublicKey(string pubfile);
 	// 得到私钥

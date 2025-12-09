@@ -26,6 +26,8 @@ public:
 	friend void* workHard(void* arg);
 	// 秘钥协商
 	string seckeyAgree(RequestMsg* reqMsg);
+	// 秘钥注销
+	string seckeyRevoke(RequestMsg* reqMsg);
 	~ServerOP();
 
 private:

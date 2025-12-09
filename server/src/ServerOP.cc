@@ -99,8 +99,8 @@ string ServerOP::seckeyAgree(RequestMsg* reqMsg)
 	Hash sha(T_SHA1);
 	sha.addData(reqMsg->data());
 	cout << "1111111111111111" << endl;
-	// 使用二进制摘要进行验证（RSA_verify 期望传入二进制摘要）
-	bool bl = rsa.rsaVerify(sha.resultRaw(), reqMsg->sign());
+	// 使用二进制摘要进行验证（显式指定 SHA1）
+	bool bl = rsa.rsaVerify(sha.resultRaw(), reqMsg->sign(), Level2);
 	cout << "00000000000000000000" << endl;
 	if (bl == false)
 	{
@@ -155,6 +155,66 @@ string ServerOP::seckeyAgree(RequestMsg* reqMsg)
 	// 5. 发送数据
 	return encMsg;
 
+}
+
+string ServerOP::seckeyRevoke(RequestMsg* reqMsg)
+{
+	RespondInfo info;
+	// 解析请求中的 seckeyID（客户端在 data 中传递 seckeyID）
+	int seckeyID = 0;
+	try {
+		seckeyID = stoi(reqMsg->data());
+	} catch (...) {
+		cout << "请求数据解析 seckeyID 失败" << endl;
+		info.status = false;
+		CodecFactory* facErr = new RespondFactory(&info);
+		Codec* cErr = facErr->createCodec();
+		string encErr = cErr->encodeMsg();
+		delete facErr; delete cErr;
+		return encErr;
+	}
+
+	// 验证签名（使用之前协商时保存的客户端公钥 public.pem）
+	RsaCrypto rsa("public.pem", false);
+	Hash sha(T_SHA1);
+	// 为了签名验证，我们把需要验证的字段组合成签名原文：clientID + serverID + seckeyID
+	string signOrigin = string(reqMsg->clientid()) + string(reqMsg->serverid()) + reqMsg->data();
+	sha.addData(signOrigin);
+	bool bl = rsa.rsaVerify(sha.resultRaw(), reqMsg->sign(), Level2);
+	if (!bl)
+	{
+		cout << "注销请求签名校验失败..." << endl;
+		info.status = false;
+	}
+	else
+	{
+		cout << "注销请求签名校验成功..." << endl;
+		// 1) 更新数据库，将 state 置为 0
+		bool dbOk = m_occi.revokeSecKey(seckeyID);
+		if (!dbOk)
+		{
+			cout << "数据库注销失败: keyid=" << seckeyID << endl;
+			info.status = false;
+		}
+		else
+		{
+			// 2) 更新共享内存，将对应节点 status 置为 0
+			NodeSecKeyInfo node = m_shm->shmRead(reqMsg->clientid(), reqMsg->serverid());
+			if (node.seckeyID == seckeyID)
+			{
+				node.status = 0;
+				m_shm->shmWrite(&node);
+			}
+			info.status = true;
+			info.seckeyID = seckeyID;
+		}
+	}
+
+	CodecFactory* fac = new RespondFactory(&info);
+	Codec* c = fac->createCodec();
+	string encMsg = c->encodeMsg();
+	delete fac; delete c;
+	return encMsg;
 }
 
 ServerOP::~ServerOP()
@@ -219,6 +279,10 @@ void* workHard(void * arg)
 	case 1:
 		// 秘钥协商
 		data = op->seckeyAgree(req);
+		break;
+	case 3:
+		// 秘钥注销
+		data = op->seckeyRevoke(req);
 		break;
 	case 2:
 		// 秘钥校验

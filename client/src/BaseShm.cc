@@ -16,13 +16,13 @@ BaseShm::BaseShm(int key, int size)
 	getShmID(key, size, IPC_CREAT | 0664);
 }
 
-BaseShm::BaseShm(string name)
+BaseShm::BaseShm(const std::string& name)
 {
 	key_t key = ftok(name.c_str(), 'x');
 	getShmID(key, 0, 0);
 }
 
-BaseShm::BaseShm(string name, int size)
+BaseShm::BaseShm(const std::string& name, int size)
 {
 	key_t key = ftok(name.c_str(), 'x');
 	// 创建共享内存

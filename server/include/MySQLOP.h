@@ -25,6 +25,8 @@ public:
     int getKeyID();
     bool updateKeyID(int keyID);  // 修正拼写：updata -> update
     bool writeSecKey(NodeSecKeyInfo* pNode);
+    // 将指定 keyID 的密钥状态置为 0（注销）
+    bool revokeSecKey(int keyID);
     void closeDB();
 
 private:

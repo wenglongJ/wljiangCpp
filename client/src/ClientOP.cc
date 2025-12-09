@@ -60,7 +60,8 @@ bool ClientOP::seckeyAgree()
 	// 创建哈希对象
 	Hash sha1(T_SHA1);
 	sha1.addData(str.str());
-	reqInfo.sign = rsa.rsaSign(sha1.result());	// 公钥的的哈希值签名
+	// 使用二进制摘要进行签名（RSA_sign 期望的是二进制摘要而非十六进制字符串）
+	reqInfo.sign = rsa.rsaSign(sha1.resultRaw(), Level2);	// 公钥的的哈希值签名
 	cout << "签名完成..." << endl;
 	CodecFactory* factory = new RequestFactory(&reqInfo);
 	Codec* c =  factory->createCodec();
@@ -122,4 +123,70 @@ bool ClientOP::seckeyAgree()
 	delete tcp;
 
 	return true;
+}
+
+void ClientOP::seckeyCheck()
+{
+	// TODO: implement seckey check if needed
+}
+
+void ClientOP::seckeyZhuXiao()
+{
+	// 1. 读取共享内存，查找当前 client/server 的秘钥信息
+	NodeSecKeyInfo node = m_shm->shmRead(m_info.ClientID, m_info.ServerID);
+	if (node.seckeyID == 0 || node.status == 0)
+	{
+		cout << "当前没有可注销的密钥" << endl;
+		return;
+	}
+
+	// 2. 构造注销请求: cmd=3, data=seckeyID
+	RequestInfo reqInfo;
+	reqInfo.clientID = m_info.ClientID;
+	reqInfo.serverID = m_info.ServerID;
+	reqInfo.cmd = 3;
+	reqInfo.data = to_string(node.seckeyID);
+
+	// 3. 签名: 使用本地私钥 private.pem 对 (clientID+serverID+seckeyID) 签名
+	RsaCrypto rsa("private.pem", true);
+	Hash sha(T_SHA1);
+	string signOrigin = reqInfo.clientID + reqInfo.serverID + reqInfo.data;
+	sha.addData(signOrigin);
+	reqInfo.sign = rsa.rsaSign(sha.resultRaw(), Level2);
+
+	// 4. 序列化并发送请求
+	CodecFactory* factory = new RequestFactory(&reqInfo);
+	Codec* c = factory->createCodec();
+	string encstr = c->encodeMsg();
+	delete factory; delete c;
+
+	TcpSocket* tcp = new TcpSocket;
+	int ret = tcp->connectToHost(m_info.ip, m_info.port);
+	if (ret != 0)
+	{
+		cout << "连接服务器失败..." << endl;
+		delete tcp;
+		return;
+	}
+	tcp->sendMsg(encstr);
+	string msg = tcp->recvMsg();
+
+	// 5. 解析服务器返回
+	factory = new RespondFactory(msg);
+	c = factory->createCodec();
+	RespondMsg* res = (RespondMsg*)c->decodeMsg();
+	if (!res->status())
+	{
+		cout << "密钥注销失败" << endl;
+	}
+	else
+	{
+		cout << "密钥注销成功: keyid=" << res->seckeyid() << endl;
+		// 更新共享内存, 将该节点 status 置为 0
+		node.status = 0;
+		m_shm->shmWrite(&node);
+	}
+
+	delete factory; delete c;
+	tcp->disConnect(); delete tcp;
 }
