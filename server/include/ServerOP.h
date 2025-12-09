@@ -1,10 +1,18 @@
 ﻿#pragma once
 #include <map>
+#include <string>
 #include "TcpServer.h"
 #include "Message.pb.h"
 #include "MySQLOP.h"
 #include "SecKeyShm.h"
-// 处理客户端请求
+
+// ServerOP: 处理客户端请求的顶层类
+// 说明与注意事项：
+// - `startServer()` 会创建监听并为每个连接创建工作线程（调用 `workHard`）。
+// - `m_list` 存储线程到 `TcpSocket*` 的映射；线程创建后由工作线程负责删除并释放对应的 `TcpSocket` 对象。
+// - 共享资源（例如 `m_list`）在当前实现中未加锁；如果多线程同时操作同一数据结构，需要在外层增加互斥保护。
+// - `ServerOP` 包含 `MySQLOP` 的实例（DB）和 `SecKeyShm*`（共享内存），请注意这两者的生命周期与并发约束。
+//
 class ServerOP
 {
 public:

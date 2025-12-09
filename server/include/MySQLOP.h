@@ -7,8 +7,10 @@
 #include <cppconn/resultset.h>
 #include "SeckKeyNodeInfo.h"
 
-using namespace std;
-
+// MySQLOP: 简单的数据库操作封装（基于 Connector/C++）
+// 约定：
+// - 成员函数在内部对 Statement/PreparedStatement/ResultSet 使用 `new` 分配且负责 `delete`。
+// - m_conn 由 connectDB 创建并在 closeDB 中释放（delete），请确保在析构前调用 closeDB 或依赖析构。
 class MySQLOP
 {
 public:
