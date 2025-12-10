@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include <iostream>
-using namespace std;
 
 class BaseShm
 {
@@ -10,9 +9,9 @@ public:
 	// 通过传递进来的key创建/打开共享内存
 	BaseShm(int key, int size);
 	// 通过路径打开共享内存
-	BaseShm(string name);
+	BaseShm(const std::string &name);
 	// 通过路径创建/打开共享内存
-	BaseShm(string name, int size);
+	BaseShm(const std::string &name, int size);
 	void* mapShm();
 	int unmapShm();
 	int delShm();

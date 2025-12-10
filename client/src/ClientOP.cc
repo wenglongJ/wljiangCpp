@@ -133,7 +133,11 @@ void ClientOP::seckeyCheck()
 void ClientOP::seckeyZhuXiao()
 {
 	// 1. 读取共享内存，查找当前 client/server 的秘钥信息
+	std::cout << "开始读取共享内存中的密钥信息..." << m_info.ClientID <<", "<< m_info.ServerID << std::endl;
 	NodeSecKeyInfo node = m_shm->shmRead(m_info.ClientID, m_info.ServerID);
+	std::cout << "读取共享内存中的密钥信息: " << node.clientID << ", "
+			  << node.serverID << ", " << node.seckeyID << ", "
+			  << node.status << ", " << node.seckey << std::endl;
 	if (node.seckeyID == 0 || node.status == 0)
 	{
 		cout << "当前没有可注销的密钥" << endl;

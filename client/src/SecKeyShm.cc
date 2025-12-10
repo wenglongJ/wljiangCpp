@@ -65,6 +65,7 @@ int SecKeyShm::shmWrite(NodeSecKeyInfo * pNodeInfo)
 		if (memcmp(&tmpNodeInfo, pNode, sizeof(NodeSecKeyInfo)) == 0)
 		{
 			ret = 0;
+			std::cout <<pNodeInfo->clientID<<" , "<<pNodeInfo->serverID<<std::endl;
 			memcpy(pNode, pNodeInfo, sizeof(NodeSecKeyInfo));
 			cout << "写数据成功: 在新的节点上添加数据!" << endl;
 			break;
@@ -79,7 +80,7 @@ int SecKeyShm::shmWrite(NodeSecKeyInfo * pNodeInfo)
 	return ret;
 }
 
-NodeSecKeyInfo SecKeyShm::shmRead(string clientID, string serverID)
+NodeSecKeyInfo SecKeyShm::shmRead(const string &clientID, const string &serverID)
 {
 	int ret = 0;
 	// 关联共享内存
@@ -96,9 +97,12 @@ NodeSecKeyInfo SecKeyShm::shmRead(string clientID, string serverID)
 	NodeSecKeyInfo info;
 	NodeSecKeyInfo	*pNode = NULL;
 	// 通过clientID和serverID查找节点
+	std::cout << "开始查找节点: " << clientID << ", " << serverID << std::endl;
 	for (i = 0; i < m_maxNode; i++)
 	{
+		std::cout << "检查节点索引: " << i << std::endl;
 		pNode = pAddr + i;
+		std::cout << "节点信息: " << pNode->clientID << ", " << pNode->serverID << std::endl;
 		// 调试输出已移除
 		if (strcmp(pNode->clientID, clientID.data()) == 0 &&
 			strcmp(pNode->serverID, serverID.data()) == 0)

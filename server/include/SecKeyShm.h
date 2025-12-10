@@ -17,7 +17,7 @@ public:
 
 	void shmInit();
 	int shmWrite(NodeSecKeyInfo* pNodeInfo);
-	NodeSecKeyInfo shmRead(std::string clientID, std::string serverID);
+	NodeSecKeyInfo shmRead(const std::string &clientID, const std::string &serverID);
 
 private:
 	int m_maxNode;

@@ -44,6 +44,7 @@ int SecKeyShm::shmWrite(NodeSecKeyInfo * pNodeInfo)
 
 	// 判断传入的网点密钥是否已经存在
 	NodeSecKeyInfo	*pNode = NULL;
+	std::cout << "开始写入节点: " << pNodeInfo->clientID << ", " << pNodeInfo->serverID << std::endl;
 	for (int i = 0; i < m_maxNode; i++)
 	{
 		// pNode依次指向每个节点的首地址
@@ -74,7 +75,8 @@ int SecKeyShm::shmWrite(NodeSecKeyInfo * pNodeInfo)
 		{
 			ret = 0;
 			memcpy(pNode, pNodeInfo, sizeof(NodeSecKeyInfo));
-			cout << "写数据成功: 在新的节点上添加数据!" << endl;
+			std::cout <<pNodeInfo->clientID<<" , "<<pNodeInfo->serverID<<std::endl;
+			//cout << "写数据成功: 在新的节点上添加数据!" << endl;
 			break;
 		}
 	}
@@ -87,7 +89,7 @@ int SecKeyShm::shmWrite(NodeSecKeyInfo * pNodeInfo)
 	return ret;
 }
 
-NodeSecKeyInfo SecKeyShm::shmRead(std::string clientID, std::string serverID)
+NodeSecKeyInfo SecKeyShm::shmRead(const std::string &clientID, const std::string &serverID)
 {
 	int ret = 0;
 	// 关联共享内存
@@ -105,7 +107,7 @@ NodeSecKeyInfo SecKeyShm::shmRead(std::string clientID, std::string serverID)
 	NodeSecKeyInfo info;
 	NodeSecKeyInfo	*pNode = NULL;
 	// 通过clientID和serverID查找节点
-	cout << "maxNode: " << m_maxNode << endl;
+	//cout << "maxNode: " << m_maxNode << endl;
 	for (i = 0; i < m_maxNode; i++)
 	{
 		pNode = pAddr + i;
